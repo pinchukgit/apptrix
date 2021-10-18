@@ -20,5 +20,6 @@ from main import views
 
 urlpatterns = [
     path("api/clients/create", views.UserViewSet.as_view({"post": "create"})),
+    path("api/clients", views.UserViewSet.as_view({"get": "list"})),
     path('admin/', admin.site.urls),
 ]
