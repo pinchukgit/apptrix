@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: CegthGfhjkm
+  
+  web: 
+    build: .
+    ports: 
+    - "11111:80"
+    volumes:
+      - ./:/code
+    depends_on:
+      - database
+    working_dir: /code
+    environment:
+        DB_USER: postgres
+        DB_PASSWORD: CegthGfhjkm
+        DB_NAME: postgres
+        DB_PORT: 5432
+    command: tail -f /dev/null
+    
