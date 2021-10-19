@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from PIL import Image
 from .models import User
 import os
 from PIL import Image
@@ -7,7 +6,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from apptrix import settings
 from io import BytesIO
 from django.contrib.auth import authenticate
-from django.shortcuts import Http404, get_object_or_404
+
 
 watermark_dir = os.path.join(settings.BASE_DIR, "watermark")
 transparency = 50
@@ -19,12 +18,32 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "email", "first_name", "last_name", "password",
-                  "avatar", "likes")
+                  "likes", "latitude", "longitude", "avatar")
         extra_kwargs = {'password': {'write_only': True},
                         "likes": {"read_only": True}}
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    distance = serializers.SerializerMethodField("get_distance",
+                                                 read_only=True)
+
+    class Meta:
+        model = User
+        fields = ("id",
+                  "email",
+                  "first_name",
+                  "last_name",
+                  "distance",
+                  "watemark_avatar")
+
+    def get_distance(self, owner):
+
+        return owner.get_geo_distance(
+            self.context['request'].user.latitude,
+            self.context['request'].user.longitude)
 
 
 class UserSerializerWithAvatar(serializers.ModelSerializer):

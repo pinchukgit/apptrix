@@ -8,6 +8,8 @@ from datetime import timedelta
 from apptrix import settings
 import jwt
 from .managers import UserManager
+import math
+from decimal import Decimal
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -27,6 +29,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     watemark_avatar = models.ImageField(upload_to='watermark_avatars/',
                                          null=True, blank=True)
     likes = models.ManyToManyField('self', symmetrical=False)
+    latitude = models.DecimalField(_('latitude'), max_digits=9,
+                                   decimal_places=6, null=True)
+    longitude = models.DecimalField(_('longitude'), max_digits=9,
+                                    decimal_places=6, null=True)
 
     objects = UserManager()
 
@@ -57,6 +63,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def token(self):
         return self._generate_jwt_token()
+
+    def get_geo_distance(self, lat, lon):
+
+        if not self.latitude or not self.longitude:
+            return None
+
+        p = Decimal(math.pi / 180)
+        a = 0.5 - math.cos((self.latitude-lat) * p) / 2 + math.cos(lat * p) * \
+            math.cos(self.latitude*p) * \
+            (1 - math.cos((self.longitude-lon) * p)) / 2
+
+        return Decimal(12742 * math.asin(math.sqrt(a)))
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)

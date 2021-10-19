@@ -1,15 +1,16 @@
-from django.shortcuts import render
 from rest_framework import viewsets, status, views
 from rest_framework.response import Response
-from django.core.files import File
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
     UserSerializer,
     UserSerializerWithAvatar,
     UserAuthenticateSerializer,
+    UserListSerializer
 )
 from .models import User
+from .service import UserFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
@@ -38,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializerWithAvatar(data=request.data)
         else:
             serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(status=201)
         else:
@@ -68,6 +69,14 @@ class UserMatchViewSet(views.APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+class UserListView(viewsets.ModelViewSet):
 
+    serializer_class = UserListSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = UserFilter
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
 
+    class Meta:
+        model = User
 
