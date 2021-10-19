@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import datetime
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -138,3 +139,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 WATEMARK_DIR = os.path.join(BASE_DIR, 'watemarks')
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        "main.backends.JWTAuthentication"
+    ]
+}
+
+
+TOKEN_EXPIRATION = datetime.timedelta(seconds=3000)
+
+JWT_AUTH = {
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_EXPIRATION_DELTA': TOKEN_EXPIRATION,
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+}

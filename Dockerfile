@@ -7,3 +7,4 @@ RUN pip install djangorestframework
 RUN pip install beautifulsoup4
 RUN pip install psycopg2
 RUN pip install Pillow
+RUN pip install djangorestframework-jwt

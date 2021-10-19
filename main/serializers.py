@@ -6,6 +6,8 @@ from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from apptrix import settings
 from io import BytesIO
+from django.contrib.auth import authenticate
+from django.shortcuts import Http404, get_object_or_404
 
 watermark_dir = os.path.join(settings.BASE_DIR, "watermark")
 transparency = 50
@@ -16,8 +18,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "first_name", "last_name", "password", "avatar")
-        extra_kwargs = {'password': {'write_only': True},}
+        fields = ("id", "email", "first_name", "last_name", "password",
+                  "avatar", "likes")
+        extra_kwargs = {'password': {'write_only': True},
+                        "likes": {"read_only": True}}
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -62,3 +66,42 @@ class UserSerializerWithAvatar(serializers.ModelSerializer):
             None
         )
         return User.objects.create_user(**validated_data)
+
+
+class UserAuthenticateSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=255, write_only=True)
+    password = serializers.CharField(max_length=128, write_only=True)
+
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    def validate(self, attrs):
+        print(attrs)
+        email = attrs.get('email', None)
+        password = attrs.get("password", None)
+
+        if not email:
+            raise serializers.ValidationError(
+                'An email address is required to log in.'
+            )
+        if not password:
+            raise serializers.ValidationError(
+                'A password is required to log in.'
+            )
+
+        user = authenticate(username=email,
+                            password=password)
+
+        if not user:
+            raise serializers.ValidationError(
+                'A user with this email and password was not found.'
+            )
+
+        if not user.is_active:
+            raise serializers.ValidationError(
+                'This user has been deactivated.'
+            )
+
+        return {
+            "token": user.token
+        }
+

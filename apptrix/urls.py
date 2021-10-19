@@ -21,5 +21,7 @@ from main import views
 urlpatterns = [
     path("api/clients/create", views.UserViewSet.as_view({"post": "create"})),
     path("api/clients", views.UserViewSet.as_view({"get": "list"})),
+    path("api/clients/<int:pk>/match", views.UserMatchViewSet.as_view()),
+    path("api/login", views.UserAuthenticateViewSet.as_view()),
     path('admin/', admin.site.urls),
 ]
