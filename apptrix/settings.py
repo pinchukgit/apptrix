@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'main',
-
+    'products',
 ]
 
 MIDDLEWARE = [
@@ -156,3 +156,12 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': TOKEN_EXPIRATION,
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
+
+
+BROKER_URL = 'redis://redis:6379'
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'

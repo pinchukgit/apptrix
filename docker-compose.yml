@@ -6,7 +6,18 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: CegthGfhjkm
-  
+  redis:
+    image: redis
+    restart: always
+  celery:
+    build: .
+    volumes:
+      - ./:/code
+    working_dir: /code
+    depends_on:
+      - redis
+    command:
+      celery -A apptrix worker -l INFO
   web: 
     build: .
     ports: 
@@ -15,6 +26,7 @@ services:
       - ./:/code
     depends_on:
       - database
+      - celery
     working_dir: /code
     environment:
         DB_USER: postgres

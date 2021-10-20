@@ -8,3 +8,6 @@ RUN pip install beautifulsoup4
 RUN pip install psycopg2
 RUN pip install Pillow
 RUN pip install djangorestframework-jwt
+RUN pip install requests
+RUN pip install celery
+RUN pip install redis

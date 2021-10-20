@@ -21,6 +21,5 @@ class UserFilter(filters.FilterSet):
             u_distance = u.get_geo_distance(latitude, longitude)
             if u_distance and u_distance < value:
                 ids.append(u.id)
-                u.distance = u_distance
         return queryset.filter(id__in=ids)
 

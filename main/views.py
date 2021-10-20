@@ -12,22 +12,7 @@ from .serializers import (
 from .models import User
 from .service import UserFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
-
-def send_email(user1, user2):
-    template = "«Вы понравились {first_name}! Почта участника: {email}»"
-    user1.email_user(
-        message=template.format(first_name=user2.first_name,
-                                email=user2.email),
-        from_email=user2.email,
-        subject="Apptrix"
-    )
-    user2.email_user(
-        message=template.format(first_name=user1.first_name,
-                                email=user1.email),
-        from_email=user1.email,
-        subject="Apptrix"
-    )
+from apptrix.celery import send_email
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -63,7 +48,8 @@ class UserMatchViewSet(views.APIView):
 
         user = get_object_or_404(User, pk=pk)
         if request.user in user.likes.all():
-            send_email(request.user, user)
+            print(request.user, user)
+            send_email.apply_async((request.user.id, user.id))
         else:
             user.likes.add(request.user)
         return Response(status=status.HTTP_200_OK)

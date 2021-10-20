@@ -21,9 +21,8 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path("api/clients/create", views.UserViewSet.as_view({"post": "create"})),
-    path("api/clients/<int:pk>/match", views.UserMatchViewSet.as_view()),
     path("api/login", views.UserAuthenticateViewSet.as_view()),
     path("api/list", views.UserListView.as_view({"get": "list"})),
-    path('admin/', admin.site.urls),
+    path("api/clients/<int:pk>/match", views.UserMatchViewSet.as_view()),
+    path("api/clients/create", views.UserViewSet.as_view({"post": "create"})),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
